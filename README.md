@@ -61,10 +61,16 @@ cd nano-vllm-ascend
 Install the package in editable mode:
 
 ```bash
-pip install -e .
+pip install -e ".[ascend]"
 ```
 
 Ascend-specific dependencies depend on your hardware, driver, CANN, and `torch-npu` environment. Detailed setup instructions will be added as the adaptation progresses.
+
+CUDA-only dependencies are optional:
+
+```bash
+pip install -e ".[cuda]"
+```
 
 ## Model Download
 
@@ -87,6 +93,7 @@ from nanovllm import LLM, SamplingParams
 
 llm = LLM(
     "/YOUR/MODEL/PATH",
+    device="npu",
     enforce_eager=True,
     tensor_parallel_size=1,
 )
@@ -103,6 +110,19 @@ print(outputs[0]["text"])
 ```
 
 > Note: Ascend execution support is still being implemented. Some code paths may currently rely on the original CUDA-oriented implementation.
+
+## Ascend Eager Smoke Test
+
+The first supported Ascend target is single-card eager execution:
+
+```bash
+python scripts/ascend_smoke.py --model /YOUR/MODEL/PATH --max-tokens 1
+python scripts/ascend_bench.py --model /YOUR/MODEL/PATH --batch-size 1 --max-tokens 16
+```
+
+Use `docs/ascend-bridge.md` to record CANNLAB environment information, run
+commands, failures, TTFT, TPOT, and memory observations. Do not report
+acceleration claims until those numbers are measured on the target NPU.
 
 ## Ascend Adaptation Notes
 
